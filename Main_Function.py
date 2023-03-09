@@ -13,11 +13,25 @@ import CVAE_Network
 sys.path.append('C:/Users/Shahnawaz/Desktop/DD2412 DL Advanced/vae_ood/Supporting_Function.py')
 import Supporting_Function
 
-def Model_Training(dataset):
+dataset = ['fashion_mnist','grayscale']
+# dataset = ['mnist','grayscale']
+# dataset = ['emnist/letters','grayscale']
+# dataset = ['sign_lang','grayscale']
+# dataset = ['noise','grayscale']
+
+# dataset = ['svhn_cropped','color']
+# dataset = ['cifar10','color']
+# dataset = ['gtsrb','color']
+# dataset = ['celeb_a','color']
+# dataset = ['compcars','color']
+# dataset = ['kitti','color']
+  
+  
+def Model_Training(argv):
     
   ##### Normalization 
-  #Normalization_Type = 'contrast_norm'
-  Normalization_Type = 'same' 
+  Normalization_Type = 'contrast_norm'
+  #Normalization_Type = 'same' 
   # Normalization_Type = tf.keras.layers.BatchNormalization
   
   ##### Choosing Dataset Type
@@ -33,17 +47,16 @@ def Model_Training(dataset):
   
   for i in range(len(dataset)-1):
       dataset_name = dataset[0]
-    
+          
   ##### Giving Some Specifications as an Input
   
   print("----------SPECIFICATIONS----------")
   Batch_Size = 64
-  Evaluation_Every = 100
   Number_of_Filters = 32
   Latent_Dimension = 100
   Visible_Distribution = 'cont_bernoulli'
   
-  print("Name of the Dataset",str(dataset_name))
+  print("Name of the Dataset:",str(dataset_name))
   print("Batch Size:",Batch_Size)
   print("Distribution:",Visible_Distribution)
   print("Number of Filters:",Number_of_Filters)
@@ -51,7 +64,7 @@ def Model_Training(dataset):
   print(" ")
                                         
   ##### Fetching Training, Validation & Testing Dataset                                    
-  Training, Validation = dataset_prep.get_dataset(str(dataset_name), Batch_Size,mode,normalize=None,dequantize=False,shuffle_train=True,visible_dist=Visible_Distribution)
+  Training, Validation, Testing = dataset_prep.get_dataset(str(dataset_name), Batch_Size,mode,normalize=None,dequantize=False,shuffle_train=True,visible_dist=Visible_Distribution)
   
   ##### Fetching Variational Autoencoder Model
   Variational_Autoencoder = CVAE_Network.CVAE(input_shape=(Number_of_Filters, Number_of_Filters, Channels),num_filters=Number_of_Filters,latent_dim=Latent_Dimension,visible_dist=Visible_Distribution)
@@ -68,12 +81,12 @@ def Model_Training(dataset):
   
   Epochs=1# 50
 
-  print("Initializing the Training")
+  print("----------Initializing the Training----------")
   # Creating a callback to save the model's weights only during training
   callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path,save_weights_only=True,verbose=1)
   Variational_Autoencoder.fit(Training,epochs=Epochs,validation_data=Validation,callbacks=[callback])
     
-  print("Initializing the Evaluation")
+  print("----------Initializing the Evaluation----------")
   #weights = tf.io.gfile.listdir(Directory_Model).sort()
   Variational_Autoencoder.build([None]+list((Number_of_Filters, Number_of_Filters, Channels)))
     
@@ -88,18 +101,4 @@ def Model_Training(dataset):
      pickle.dump(probs_res, f)
 
 if __name__ == '__main__':
-    
-  dataset = ['fashion_mnist','grayscale']
-  # dataset = ['mnist','grayscale']
-  # dataset = ['emnist/letters','grayscale']
-  # dataset = ['sign_lang','grayscale']
-  # dataset = ['noise','grayscale']
-
-  # dataset = ['svhn_cropped','color']
-  # dataset = ['cifar10','color']
-  # dataset = ['gtsrb','color']
-  # dataset = ['celeb_a','color']
-  # dataset = ['compcars','color']
-  # dataset = ['kitti','color']
-  
-  app.run(Model_Training(dataset))
+  app.run(Model_Training)
