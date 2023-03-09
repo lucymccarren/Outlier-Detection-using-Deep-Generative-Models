@@ -3,7 +3,7 @@ import pickle
 
 from absl import app
 import tensorflow as tf
-from vae_ood import Generate_Datasets, CVAE_Network, utils 
+from vae_ood import dataset_prep, CVAE_Network, utils 
 
 # Generate_Datasets: Dataset_Utils
 # CVAE_Network: Network
@@ -48,7 +48,7 @@ def Model_Training(dataset):
   print(" ")
                                         
   ##### Fetching Training, Validation & Testing Dataset                                    
-  Training, Validation, Testing = Generate_Datasets.get_dataset(dataset_name, Batch_Size,mode,normalize=Normalization_type,dequantize=False,visible_dist=Visible_Distribution)
+  Training, Validation, Testing = dataset_prep.get_dataset(dataset_name, Batch_Size,mode,normalize=Normalization_type,dequantize=False,visible_dist=Visible_Distribution)
   
   ##### Fetching Variational Autoencoder Model
   Variational_Autoencoder = CVAE_Network.CVAE(input_shape=(Number_of_Filters, Number_of_Filters, Channels),num_filters=Number_of_Filters,latent_dim=Latent_Dimension,visible_dist=Visible_Distribution)
