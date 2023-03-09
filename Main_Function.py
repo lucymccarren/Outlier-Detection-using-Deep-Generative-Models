@@ -1,23 +1,23 @@
 import os
+import sys
 import pickle
-
 from absl import app
 import tensorflow as tf
-from vae_ood import dataset_prep, CVAE_Network, utils 
 
-# Generate_Datasets: Dataset_Utils
-# CVAE_Network: Network
+sys.path.append('C:/Users/Shahnawaz/Desktop/DD2412 DL Advanced/vae_ood/dataset_prep.py')
+import dataset_prep
+
+sys.path.append('C:/Users/Shahnawaz/Desktop/DD2412 DL Advanced/vae_ood/CVAE_Network.py')
+import CVAE_Network
+
+sys.path.append('C:/Users/Shahnawaz/Desktop/DD2412 DL Advanced/vae_ood/Supporting_Function.py')
+import Supporting_Function
 
 def Model_Training(dataset):
     
-  ##### Normalization
-  Normalization_type = None
-  Test_Normalization_type = 'same' # To be applied at test time
-
-  if Test_Normalization_type == 'same':
-    test_normalize = Normalization_type
-  else:
-    test_normalize = Test_Normalization_type
+  ##### Normalization 
+  Normalization_Type = 'contrast_norm'
+  # Normalization_Type = 'same' 
   
   ##### Choosing Dataset Type
   for i in range(len(dataset)-1):
@@ -45,10 +45,11 @@ def Model_Training(dataset):
   print("Batch Size:",Batch_Size)
   print("Distribution:",Visible_Distribution)
   print("Number of Filters:",Number_of_Filters)
+  print("cont_bernoulli:",Visible_Distribution)
   print(" ")
                                         
   ##### Fetching Training, Validation & Testing Dataset                                    
-  Training, Validation, Testing = dataset_prep.get_dataset(dataset_name, Batch_Size,mode,normalize=Normalization_type,dequantize=False,visible_dist=Visible_Distribution)
+  Training, Validation, Testing = dataset_prep.get_dataset(dataset_name, Batch_Size,mode,normalize=None,dequantize=False,visible_dist=Visible_Distribution)
   
   ##### Fetching Variational Autoencoder Model
   Variational_Autoencoder = CVAE_Network.CVAE(input_shape=(Number_of_Filters, Number_of_Filters, Channels),num_filters=Number_of_Filters,latent_dim=Latent_Dimension,visible_dist=Visible_Distribution)
@@ -60,30 +61,30 @@ def Model_Training(dataset):
   ##### Initializing the Training & Evaluation
   start_training= True
   start_evaluation = True
-  Epochs=10
-  Directory_Model = os.path.join('test' , f'Models/{dataset_name}/{mode}/{Channels}')
-  Directory_Log = os.path.join('test' , 'logs',  f'Models/{dataset_name}/{mode}/{Channels}')
+  Epochs=1
+  Directory_Model = os.path.join('test' , f'Models\{dataset_name}\{mode}\{Visible_Distribution}')
+  Directory_Log = os.path.join('test' , 'logs',  f'Models\{dataset_name}\{mode}\{Visible_Distribution}')
 
   if start_training:
     tf.io.gfile.makedirs(Directory_Model)
-    callbacks = [utils.TensorBoardWithLLStats(Evaluation_Every, dataset_name,dataset_name, mode, Normalization_type, Visible_Distribution,log_dir=Directory_Log,
+    callbacks = [Supporting_Function.TensorBoardWithLLStats(Evaluation_Every, dataset_name,dataset_name, mode, Normalization_Type, Visible_Distribution,log_dir=Directory_Log,
             update_freq='epoch'), tf.keras.callbacks.ModelCheckpoint(filepath=os.path.join(Directory_Model, 'weights.hdf5'),verbose=1, save_weights_only=True, save_best_only=True)]
 
     print("Initializing the Training")
     Variational_Autoencoder.fit(Training,epochs=Epochs,validation_data=Validation,callbacks=callbacks)
-  
+    # test\Models\fashion_mnist\grayscale\1\weights.hdf5
   if start_evaluation:
     weights = tf.io.gfile.listdir(Directory_Model).sort()
     Variational_Autoencoder.build([None]+list((Number_of_Filters, Number_of_Filters, Channels)))
     
-    weights_path = os.path.join(Directory_Model, weights[-1])
+    weights_path = os.path.join(Directory_Model,weights[-1])
     Variational_Autoencoder.load_weights(weights_path)
 
     Variational_Autoencoder.compute_corrections(Training)
     
     print("Initializing the Evaluation")
     Variational_Autoencoder.evaluate(Validation)
-    probs_res = utils.get_probs(dataset_name, Variational_Autoencoder ,mode,test_normalize, n_samples=5,split='test',training=False,visible_dist=Visible_Distribution)
+    probs_res = Supporting_Function.get_probs(dataset_name, Variational_Autoencoder ,mode,Normalization_Type, n_samples=5,split='test',training=False,visible_dist=Visible_Distribution)
                       
     with tf.io.gfile.GFile(os.path.join(Directory_Model, 'probs.pkl'), 'wb') as f:
       pickle.dump(probs_res, f)
