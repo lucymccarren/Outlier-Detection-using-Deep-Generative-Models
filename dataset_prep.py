@@ -9,9 +9,60 @@ from skimage import exposure
 import tensorflow as tf
 import tensorflow_datasets as tfds
 import tensorflow_probability as tfp
-import contrast_bias_correction
 
+## Data Augmentation
 partial = functools.partial
+
+def correction_contrast_bias(image):
+    """Corresponds to formula given in part 3.3"""
+
+    a = tfp.stats.percentile(image, 5)
+    r = tfp.stats.percentile(image, 95) - a
+
+    norm = (image - a) / r
+    
+    #any values less than 0 clip to 0, greater than 1 clip to 1
+    norm = tf.clip_by_value(norm, 0., 1.)
+
+    return norm
+
+def Generate_Vertically_Flipped_Cifar10(split, cls):
+    image='cifar10'
+    
+    X = tf.placeholder(tf.float32, shape = (image.shape[0], image.shape[1], 3))
+    flipped = tf.image.flip_up_down(X)
+    
+    (ds_train, ds_val, ds_test) = tfds.load(flipped ,split=['train[:90%]','train[90%:]','test'],as_supervised=True)
+    ds_test = ds_test.shuffle(1000)
+
+    if split == b'train':
+        ds = ds_train
+    elif split == b'val':
+        ds = ds_val
+    else:
+        ds = ds_test
+
+    for x, y in ds:
+        if y == cls:
+            yield x
+
+def Generate_Vertically_Flipped_Kitti(split, cls):
+    image='kitti'
+    flipped = tf.image.flip_up_down(image)
+    
+    (ds_train, ds_val, ds_test) = tfds.load(flipped,split=['train[:90%]','train[90%:]','test'],as_supervised=True)
+   
+    if split == b'train':
+        ds = ds_train
+    elif split == b'val':
+        ds = ds_val
+    else:
+        ds = ds_test
+
+    for x, y in ds:
+        if y == cls:
+            yield x
+            
 
     
 def noise_generator(split=b'val', mode=b'grayscale'):
@@ -148,6 +199,7 @@ def kitti(split, cls):
             
 
 def get_dataset(name,batch_size,mode,normalize=None, dequantize=False,shuffle_train=True,visible_dist='cont_bernoulli' ):
+    print(name)
     def preprocess(image, inverted, mode, normalize, dequantize, visible_dist):
         if isinstance(image, dict):
             image = image['image']
@@ -167,7 +219,7 @@ def get_dataset(name,batch_size,mode,normalize=None, dequantize=False,shuffle_tr
 
         if isinstance(normalize, str) and normalize.startswith('contrast_norm'):
             
-            correction_contrast_bias(im)
+            correction_contrast_bias(image)
 
         elif normalize is not None:
             
@@ -183,11 +235,9 @@ def get_dataset(name,batch_size,mode,normalize=None, dequantize=False,shuffle_tr
 
         return image, target
 
-    assert name in [
-      'svhn_cropped', 'cifar10', 'celeb_a', 'gtsrb', 'compcars', 'mnist','kitti'
-      'fashion_mnist', 'sign_lang', 'emnist/letters', 'noise','image_contrast','pixel_intensity',
-      *[f'cifar10-{i}' for i in range(10)]
-    ], f'Dataset {name} not supported'
+    assert name in ['fashion_mnist',
+      'svhn_cropped', 'cifar10', 'celeb_a', 'gtsrb', 'compcars', 'mnist','kitti', 'sign_lang', 'emnist/letters', 'noise','image_contrast','pixel_intensity',
+      *[f'cifar10-{i}' for i in range(10)]], f'Dataset {name} not supported'
 
     inverted = False
     if name.endswith('inverted'):
