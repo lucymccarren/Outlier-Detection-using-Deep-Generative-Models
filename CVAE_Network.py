@@ -10,7 +10,7 @@ import tqdm
 
 import sys
 sys.path.append('C:/Users/Shahnawaz/Desktop/DD2412 DL Advanced/vae_ood/Compute_Likelihood_Analytically.py')
-import Compute_Likelihood_Analytically
+import _1_analytical_correction
 
 tfk = tf.keras
 tfkl = tf.keras.layers
@@ -42,7 +42,7 @@ class VAE(tfk.Model):
       self.corr_dict = {}
       targets = np.linspace(1e-3, 1-1e-3, 999)
       for target in targets:
-        self.corr_dict[(target * 1000).round().astype(np.int32)] = Compute_Likelihood_Analytically.Neg_Reconstruction_Error(scipy.optimize.fmin(Compute_Likelihood_Analytically.Neg_Reconstruction_Error, 0.5, args=(target,), disp=False)[0],target)
+        self.corr_dict[(target * 1000).round().astype(np.int32)] = _1_analytical_correction.Neg_Reconstruction_Error(scipy.optimize.fmin(Compute_Likelihood_Analytically.Neg_Reconstruction_Error, 0.5, args=(target,), disp=False)[0],target)
       corr_func = lambda pix: self.corr_dict[pix]
       self.correct = np.vectorize(corr_func)
       
@@ -59,7 +59,7 @@ class VAE(tfk.Model):
       j = 0
       for train_batch in tqdm.tqdm(dataset):
         j += 1
-        pixel_ll = Compute_Likelihood_Analytically.Pixel_Likelihood(train_batch, self)
+        pixel_ll = _1_analytical_correction.Pixel_Likelihood(train_batch, self)
         inp = train_batch[1].numpy()
         if self.inp_shape[-1] == 3:
           inp[:, :, :, 1:] += 1
@@ -90,7 +90,7 @@ class VAE(tfk.Model):
       j = 0
       for train_batch in tqdm.tqdm(dataset):
         j += 1
-        pixel_ll = Compute_Likelihood_Analytically.Pixel_Likelihood(train_batch, self)
+        pixel_ll = _1_analytical_correction.Pixel_Likelihood(train_batch, self)
         inp = train_batch[1].numpy()
         if inp.max() <= 1:
           inp = (inp*255).astype(np.int32)
