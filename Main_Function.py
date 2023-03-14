@@ -108,7 +108,7 @@ def Model_Training(argv):
     print('checkpoint_path', checkpoint_path)
 
     # Create a folder to save the probabilities
-    folder_probs = os.path.join('.\\test' , f'Probs\\{Visible_Distribution}\\{mode}_{dataset_name}_nf_{Number_of_Filters}_zdim_{Latent_Dimension}')
+    folder_probs = os.path.join('.\\test' ,  f'Probs\\{mode}\\{dataset_name}\\{Normalization_Type}_{Visible_Distribution}_nf_{Number_of_Filters}_zdim_{Latent_Dimension}')
     os.makedirs(folder_probs, exist_ok=True)
 
     
