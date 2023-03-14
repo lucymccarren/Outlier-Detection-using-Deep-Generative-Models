@@ -199,7 +199,7 @@ def kitti(split, cls):
             
 
 def get_dataset(name,batch_size,mode,normalize=None, dequantize=False,shuffle_train=True,visible_dist='cont_bernoulli' ):
-    print(name)
+    print('Loading dataset: ', name)
     def preprocess(image, inverted, mode, normalize, dequantize, visible_dist):
         if isinstance(image, dict):
             image = image['image']

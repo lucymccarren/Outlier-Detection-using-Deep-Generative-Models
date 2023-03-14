@@ -11,8 +11,8 @@ import tensorflow as tf
 import tqdm
 
 import sys
-sys.path.append('C:/Users/Shahnawaz/Desktop/DD2412 DL Advanced/vae_ood/Generate_Datasets.py')
-import dataset_utils
+# sys.path.append('C:/Users/Shahnawaz/Desktop/DD2412 DL Advanced/vae_ood/Generate_Datasets.py')
+import dataset_prep
 
 from tensorflow.python.ops import summary_ops_v2  # pylint: disable=g-direct-tensorflow-import
 
@@ -112,12 +112,12 @@ def get_probs(datasets,model,mode,normalize,n_samples,split='val',training=False
   corr_probs = collections.defaultdict(list)
 
   for dataset in datasets:
-    logging.info('Dataset: %s', dataset)
+    logging.info('Evaluating dataset: %s', dataset)
     if split == 'test':
-      _, _, test = dataset_utils.get_dataset(dataset,100 // n_samples,mode=mode,normalize=normalize,dequantize=False,visible_dist=visible_dist)
+      _, _, test = dataset_prep.get_dataset(dataset,100 // n_samples,mode=mode,normalize=normalize,dequantize=False,visible_dist=visible_dist)
    
     elif split == 'val':
-      _, test, _ = dataset_utils.get_dataset(
+      _, test, _ = dataset_prep.get_dataset(
           dataset,
           100 // n_samples,
           mode=mode,
@@ -125,7 +125,7 @@ def get_probs(datasets,model,mode,normalize,n_samples,split='val',training=False
           dequantize=False,
           visible_dist=visible_dist)
     else:
-      test, _, _ = dataset_utils.get_dataset(
+      test, _, _ = dataset_prep.get_dataset(
           dataset,
           100 // n_samples,
           mode=mode,
@@ -133,7 +133,7 @@ def get_probs(datasets,model,mode,normalize,n_samples,split='val',training=False
           dequantize=False,
           visible_dist=visible_dist)
 
-    for test_batch in tqdm.tqdm(test):
+    for test_batch in (tqdm.tqdm(test)):
       inp = test_batch[0]
       target = test_batch[1]
       probs = model.log_prob(
@@ -156,9 +156,7 @@ def get_probs(datasets,model,mode,normalize,n_samples,split='val',training=False
       if visible_dist == 'gaussian':
         target[:, :, :, 1:] += 1
         target[:, :, :, 2:] += 1
-
-      corr_probs[dataset].append(probs -
-model.correct(target).sum(axis=(1, 2, 3)))
+      corr_probs[dataset].append(probs - model.correct(target).sum(axis=(1, 2, 3)))
 
     orig_probs[dataset] = np.concatenate(orig_probs[dataset], axis=0)
     corr_probs[dataset] = np.concatenate(corr_probs[dataset], axis=0)
