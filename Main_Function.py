@@ -4,16 +4,12 @@ import pickle
 from absl import app
 import tensorflow as tf
 from collections import defaultdict
-# sys.path.append('C:/Users/Shahnawaz/Desktop/DD2412 DL Advanced/vae_ood/dataset_prep.py')
 import dataset_prep
-
-# sys.path.append('C:/Users/Shahnawaz/Desktop/DD2412 DL Advanced/vae_ood/CVAE_Network.py')
 import CVAE_Network
-
-# sys.path.append('C:/Users/Shahnawaz/Desktop/DD2412 DL Advanced/vae_ood/Supporting_Function.py')
 import Supporting_Function
 import logging
-logging.getLogger('tensorflow').setLevel(logging.ERROR)
+logging.getLogger('tensorflow').setLevel(logging.ERROR) 
+
 # Dataset used to train the model
 # dataset = ['mnist','grayscale']
 # dataset = ['fashion_mnist','grayscale']
@@ -22,34 +18,47 @@ logging.getLogger('tensorflow').setLevel(logging.ERROR)
 # dataset = ['noise','grayscale']
 
 # dataset = ['cifar10','color']
-dataset = ['svhn_cropped','color']
-# dataset = ['gtsrb','color']
+# dataset = ['svhn_cropped','color']
 # dataset = ['celeb_a','color']
+dataset = ['kitti','color']
+# dataset = ['gtsrb','color']
 # dataset = ['compcars','color']
-# dataset = ['kitti','color']
   
-# datasets used to evaluate the model
-datasets_eval = ['cifar10','svhn_cropped','celeb_a','kitti','noise']
-# datasets_eval = ['mnist','fashion_mnist','emnist/letters','noise']
+# datasets used to evaluate the model (arbitrary choice)
+if dataset[1] == 'color':
+  datasets_eval = ['cifar10','svhn_cropped','celeb_a','kitti','noise']
+elif dataset[1] == 'grayscale':
+  datasets_eval = ['mnist','fashion_mnist','emnist/letters','noise']
+
+Number_of_Filters = 32
+Batch_Size = 64
+Latent_Dimension = 20
+
+# Normalization_Type = None
+Normalization_Type = 'contrast_norm'
+# Normalization_Type = 'same' 
+# Normalization_Type = tf.keras.layers.BatchNormalization
+  
+Visible_Distribution = 'categorical'
+# Visible_Distribution = 'cont_bernoulli'
+
+Epochs=100
+train = True
+eval = True
+
   
 def Model_Training(argv):
-
-  train = False
-  eval = True
-
-  ##### Normalization 
-  Normalization_Type = 'contrast_norm'
-  # Normalization_Type = 'same' 
-  # Normalization_Type = tf.keras.layers.BatchNormalization
   
   ##### Choosing Dataset Type
   for i in range(len(dataset)-1):
     if dataset[1] == 'color':
       mode = dataset[1]
       Channels=3
+      # Number_of_Filters = 32
     elif dataset[1] == 'grayscale':
       mode = dataset[1]
       Channels=1
+      # Number_of_Filters = 32
     else:
         print("ERROR: Choose Suitable Dataset Type")
   
@@ -58,13 +67,7 @@ def Model_Training(argv):
           
   ##### Giving Some Specifications as an Input
   
-  print("----------SPECIFICATIONS----------")
-  Batch_Size = 64
-  Number_of_Filters = 32
-  Latent_Dimension = 100
-  Visible_Distribution = 'categorical'
-  # Visible_Distribution = 'cont_bernoulli'
-  
+  print("----------SPECIFICATIONS----------")  
   print("Name of the Dataset:",str(dataset_name))
   print('Datasets used to evaluate the model:', datasets_eval)
   print("Batch Size:",Batch_Size)
@@ -90,11 +93,10 @@ def Model_Training(argv):
   
   ##### Initializing the Training & Evaluation
   
-  if train:
-    Epochs=50 
+  if train: 
     print("----------Initializing the Training----------")
     # Creating a callback to save the model's weights only during training
-    callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path,save_weights_only=True,verbose=1,save_best_only=True)
+    callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path,save_weights_only=True,verbose=1,save_best_only=False)
     Variational_Autoencoder.fit(Training,epochs=Epochs,validation_data=Validation,callbacks=[callback])
 
   if eval:  
