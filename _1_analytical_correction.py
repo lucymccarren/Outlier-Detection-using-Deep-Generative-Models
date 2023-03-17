@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 # Compute_Likelihood_Analytically
         
 def Neg_Reconstruction_Error(lambdaa,target):
-    # xi = Pixel value of ith pixel in input sample.
+    # target = Pixel value of ith pixel in input sample.
     # For Perfect reconstruction: The input pixel value is equal to the pixel reconstructed by decoder.
                                                                                                                                                                                                                                                                                                                                                                                                                                                      
     if lambdaa == float(1/2):
@@ -16,7 +16,7 @@ def Neg_Reconstruction_Error(lambdaa,target):
         xi=(lambdaa/(2*lambdaa)-1)+1/(2*np.arctanh(1-(2*lambdaa)))
     
     # Negative Reconstruction Error for cont. Bernoulli visible distribution
-    log_pdf=np.log(xi)+target*np.log(lambdaa)+(1-target)*np.log(1-lambdaa)
+    log_pdf=target*np.log(xi)+(1-target)*np.log(1-xi)
     
     return -log_pdf
 
