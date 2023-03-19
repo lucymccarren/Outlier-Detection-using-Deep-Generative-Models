@@ -217,9 +217,17 @@ def get_dataset(name,batch_size,mode,normalize=None, dequantize=False,shuffle_tr
             if image.shape[-1] != 3:
                 image = tf.image.grayscale_to_rgb(image)
 
-        if isinstance(normalize, str) and normalize.startswith('contrast_norm'):
+        if isinstance(normalize, str) and normalize.startswith('contrast_stretch_pctile5'):
             
-            correction_contrast_bias(image)
+            contrast_stretch_pctile5(image)
+         
+        elif normalize == 'equalization':
+            
+            equalization(image)
+          
+        elif normalize == 'adaptive_equalization':
+            
+            adaptive_equalization(image)
 
         elif normalize is not None:
             
