@@ -10,21 +10,11 @@ import tensorflow as tf
 import tensorflow_datasets as tfds
 import tensorflow_probability as tfp
 
+from _3_contrast_bias_correction import *
+
 ## Data Augmentation
 partial = functools.partial
 
-def correction_contrast_bias(image):
-    """Corresponds to formula given in part 3.3"""
-
-    a = tfp.stats.percentile(image, 5)
-    r = tfp.stats.percentile(image, 95) - a
-
-    norm = (image - a) / r
-    
-    #any values less than 0 clip to 0, greater than 1 clip to 1
-    norm = tf.clip_by_value(norm, 0., 1.)
-
-    return norm
 
 def Generate_Vertically_Flipped_Cifar10(split, cls):
     image='cifar10'
