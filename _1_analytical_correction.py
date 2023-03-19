@@ -11,14 +11,14 @@ def Neg_Reconstruction_Error(lambdaa,target):
     # For Perfect reconstruction: The input pixel value is equal to the pixel reconstructed by decoder.
                                                                                                                                                                                                                                                                                                                                                                                                                                                      
     if lambdaa == float(1/2):
-        xi=float(1/2)
+        xi= 2 #float(1/2)
     else:
-        xi=(lambdaa/(2*lambdaa)-1)+1/(2*np.arctanh(1-(2*lambdaa)))
+        xi= 2*np.arctanh(1-(2*lambdaa))/(1-(2*lambdaa)) #(lambdaa/(2*lambdaa)-1)+1/(2*np.arctanh(1-(2*lambdaa)))
     
     # Negative Reconstruction Error for cont. Bernoulli visible distribution
-    log_pdf=target*np.log(xi)+(1-target)*np.log(1-xi)
-    
-    return -log_pdf
+    log_pdf=-np.log(xi) - target*np.log(lambdaa) - (1-lambdaa)*np.log(1-target)
+
+    return log_pdf
 
 def Analytical_Correction_For_Intensity_Bias(Pixels): 
 
