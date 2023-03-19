@@ -7,8 +7,9 @@ import matplotlib.pyplot as plt
 # Compute_Likelihood_Analytically
         
 def Neg_Reconstruction_Error(lambdaa,target):
-    # target = Pixel value of ith pixel in input sample.
-    # For Perfect reconstruction: The input pixel value is equal to the pixel reconstructed by decoder.
+    # lambdaa = Pixel value of ith pixel in input sample.
+    # target = Corresponding pixel value in image, reconstructed by the decoder.
+    # For Perfect reconstruction: The input pixel value is equal to the pixel reconstructed by decoder
                                                                                                                                                                                                                                                                                                                                                                                                                                                      
     if lambdaa == float(1/2):
         xi= 2 #float(1/2)
