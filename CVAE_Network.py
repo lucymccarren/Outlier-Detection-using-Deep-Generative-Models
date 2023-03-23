@@ -45,7 +45,7 @@ class VAE(tfk.Model):
       self.corr_dict = {}
       targets = np.linspace(1e-3, 1-1e-3, 999)
       for target in targets:
-        self.corr_dict[(target * 1000).round().astype(np.int32)] = _1_analytical_correction.Neg_Reconstruction_Error(
+        self.corr_dict[(target * 1000).round().astype(np.int32)] = -_1_analytical_correction.Neg_Reconstruction_Error(
                         scipy.optimize.fmin(_1_analytical_correction.Neg_Reconstruction_Error, 0.5, args=(target,), disp=False)[0],target)
       corr_func = lambda pix: self.corr_dict[pix]
       self.correct = np.vectorize(corr_func)
