@@ -17,7 +17,7 @@ def Neg_Reconstruction_Error(lambdaa,target):
         xi= 2*np.arctanh(1-(2*lambdaa))/(1-(2*lambdaa)) #(lambdaa/(2*lambdaa)-1)+1/(2*np.arctanh(1-(2*lambdaa)))
     
     # Negative Reconstruction Error for cont. Bernoulli visible distribution
-    log_pdf=-np.log(xi) - target*np.log(lambdaa) - (1-lambdaa)*np.log(1-target)
+    log_pdf=-np.log(xi) - target*np.log(lambdaa) - (1-target)*np.log(1-lambdaa)
 
     return log_pdf
 
