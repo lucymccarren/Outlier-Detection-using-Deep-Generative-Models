@@ -222,9 +222,17 @@ def get_dataset(name,batch_size,mode,normalize=None, dequantize=False,shuffle_tr
         elif normalize is not None:
             
             raise NotImplementedError(f'Normalization method {normalize} not implemented')
-
+        
+        ## Data Augmentation
         if inverted:
-            image = 1 - image
+            image=tf.image.flip_up_down(image)
+        
+        if rotation_90:  #Rotation by 90 deg
+            image=tf.image.rot90(image)
+        
+        if rotation_270:  #Rotation by 270 deg counter clockwise
+            image=tf.image.rot90(image,k=3)
+            
         image = tf.clip_by_value(image, 0., 1.)
 
         target = image
@@ -237,10 +245,9 @@ def get_dataset(name,batch_size,mode,normalize=None, dequantize=False,shuffle_tr
       'svhn_cropped', 'cifar10', 'celeb_a', 'gtsrb', 'compcars', 'mnist','kitti', 'sign_lang', 'emnist/letters', 'noise','image_contrast','pixel_intensity',
       *[f'cifar10-{i}' for i in range(10)]], f'Dataset {name} not supported'
 
-    inverted = False
-    if name.endswith('inverted'):
-        name = name[:-9]
-        inverted = True
+    inverted = False  #True
+    rotation_90 = False #True
+    rotation_270 = False #True
 
     if name == 'noise':
         n_channels = 1 if mode == 'grayscale' else 3
