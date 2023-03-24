@@ -30,10 +30,13 @@ def Outlier_Detection_Analytically(log_probs,log_probs1):
       # ROC SCORE
       Original_ROC = roc_auc_score(Labels, Log_Probs_Original)
       Corrected_ROC = roc_auc_score(Labels, Log_Probs_Corrected)
-      
+      print("orgiinal",Original_ROC)
+      print("corrected",Corrected_ROC)
       # PRECISION SCORE
       Original_PRC = average_precision_score(Labels, Log_Probs_Original)
-      Corrected_PRC = average_precision_score(Labels, Log_Probs_Corrected)  
+      Corrected_PRC = average_precision_score(Labels, Log_Probs_Corrected) 
+      print("orgiinal",Original_PRC)
+      print("corrected",Corrected_PRC)
       
       # COMPUTING ORIIGNAL AND CORRECTED FALSE/TRUE POSITIVE RATE
       index_original = np.argmax(TPR>0.8)        
@@ -68,9 +71,9 @@ def Outlier_Detection_Analytically(log_probs,log_probs1):
         Log_Probs_Original1 = np.concatenate([test_listt1,test_listt2])
         Log_Probs_Corrected1 = np.concatenate([test_listt3,test_listt4])
       
-  print("...",metrics[id_data][ood_data]['orig_roc'],metrics[id_data][ood_data]['corr_roc'])
-  print("...",metrics[id_data][ood_data]['orig_prc'],metrics[id_data][ood_data]['orig_prc'])
-  print("...",metrics[id_data][ood_data]['orig_fpr'],metrics[id_data][ood_data]['corr_fpr'])
+  # print("...",metrics[id_data][ood_data]['orig_roc'],metrics[id_data][ood_data]['corr_roc'])
+  # print("...",metrics[id_data][ood_data]['orig_prc'],metrics[id_data][ood_data]['orig_prc'])
+  # print("...",metrics[id_data][ood_data]['orig_fpr'],metrics[id_data][ood_data]['corr_fpr'])
          
   print('Original AUC: %.3f' % Original_ROC)
   print("Original Precision",Original_PRC)
@@ -78,8 +81,8 @@ def Outlier_Detection_Analytically(log_probs,log_probs1):
   print("Corrected Precision",Corrected_PRC)
   
   # Creating ROC curve
-  plt.plot(fpr,tpr,color='blue',label='Without Bias Correction',linestyle='dashdot')
-  plt.plot(fpr1,tpr1,color='orange',label='With Bias Correction')
+  plt.plot(FPR,TPR,color='blue',label='Without Bias Correction',linestyle='dashdot')
+  plt.plot(FPR1,TPR1,color='orange',label='With Bias Correction')
   plt.ylabel('True Positive Rate')
   plt.xlabel('False Positive Rate')
   plt.title('AUROC Curves')
@@ -98,31 +101,34 @@ def Outlier_Detection_Analytically(log_probs,log_probs1):
   plt.legend(loc='upper left')
   plt.show()
   
-  return metrics,fpr, tpr,fpr1,tpr1
+  return metrics,FPR, TPR,FPR1,TPR1
 
 if __name__ == "__main__":
     
-    VAE_datasets_colored = ['svhn_cropped'] 
-    VAE_datasets_grayscale = ['fashion_mnist']  
+    VAE_datasets_ID = ['svhn_cropped_original'] #['svhn_cropped'] 
+    VAE_datasets_OOD = ['mnist'] #['kitti']  
    
     log_probs = defaultdict(lambda: defaultdict(dict))
     log_probs1 = defaultdict(lambda: defaultdict(dict))
 
-    for id_data in VAE_datasets_colored:
+    for id_data in VAE_datasets_ID:
       for norm in ['pctile-5']:
-        with open((f'C:/Users/Shahnawaz/Downloads/probs (1).pkl'),'rb') as f:
+        with open((f'C:/Users/Shahnawaz/Desktop/DD2412 DL Advanced/vae_ood/test/Probs/color/svhn_cropped_original/contrast_norm_cont_bernoulli_nf_32_zdim_20/probs.pkl'),'rb') as f:
           d = pickle.load(f)
-          print(d['orig_probs']['svhn_cropped'])
+          #print(d['orig_probs']['fashion_mnist'])
           
-        for i, ood_data in enumerate(VAE_datasets_colored +['celeb_a']): # Original Image from ID/ OOD from noisy
+        for i, ood_data in enumerate(VAE_datasets_ID): # Original Image from ID/ OOD from noisy
           log_probs[f'{id_data}-{norm}'][f'{ood_data}-{norm}']['orig_probs'] = d['orig_probs'][ood_data]
           log_probs[f'{id_data}-{norm}'][f'{ood_data}-{norm}']['corr_probs'] = d['corr_probs'][ood_data]
         
-        for i, ood_data in enumerate(VAE_datasets_colored):
+    for id_data in VAE_datasets_OOD:
+      for norm in ['pctile-5']:
+        with open((f'C:/Users/Shahnawaz/Desktop/DD2412 DL Advanced/vae_ood/test/Probs/grayscale/mnist/contrast_norm_cont_bernoulli_nf_32_zdim_20/probs.pkl'),'rb') as f:
+          d = pickle.load(f)
+   
+        for i, ood_data in enumerate(VAE_datasets_OOD+['noise']):
           log_probs1[f'{id_data}-{norm}'][f'{ood_data}-{norm}']['orig_probs'] = d['orig_probs'][ood_data]
           log_probs1[f'{id_data}-{norm}'][f'{ood_data}-{norm}']['corr_probs'] = d['corr_probs'][ood_data]
     
-    cb_grayscale_metrics,fpr, tpr,fpr1,tpr1 = Outlier_Detection(log_probs,log_probs1)
-
- 
-        
+    print("LOG",log_probs)
+    cb_grayscale_metrics,fpr, tpr,fpr1,tpr1 = Outlier_Detection_Analytically(log_probs,log_probs1)
