@@ -24,7 +24,8 @@ def Neg_Reconstruction_Error(lambdaa,target):
 def Analytical_Correction_For_Intensity_Bias(Pixels): 
 
     Reconstruction_LL = {}; #Dict
-    target_pixels = np.linspace(1e-3, 1-1e-3, 999)
+    start=1e-3; stop=1-start; num=999
+    target_pixels = np.linspace(start, stop, num)
         
     # Correcting Bias in the Reconstruction Error for each Pixel.
     for i in range(len(target_pixels)):
