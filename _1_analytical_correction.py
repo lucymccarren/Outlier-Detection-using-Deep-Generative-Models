@@ -30,7 +30,7 @@ def Analytical_Correction_For_Intensity_Bias(Pixels):
       func=Neg_Reconstruction_Error
       
       # Using Nelder-Mead Algorithm to maximize log(Pcb(x,Lambdaa))
-      x0 = 0.1
+      x0 = 0.5
       func_min=optimize.fmin(func, x0, args=(Pixels[i],), callback=None)
       func_min = func_min [0]
       
