@@ -24,26 +24,27 @@ def Neg_Reconstruction_Error(lambdaa,target):
 def Analytical_Correction_For_Intensity_Bias(Pixels): 
 
     Reconstruction_LL = {}; #Dict={}
-
+    target_pixels = np.linspace(1e-3, 1-1e-3, 999)
+        
     # Correcting Bias in the Reconstruction Error for each Pixel.
-    for i in range(len(Pixels)):
+    for i in range(len(target_pixels)):
       func=Neg_Reconstruction_Error
       
       # Using Nelder-Mead Algorithm to maximize log(Pcb(x,Lambdaa))
       x0 = 0.5
-      func_min=optimize.fmin(func, x0, args=(Pixels[i],), callback=None)
+      func_min=optimize.fmin(func, x0, args=(target_pixels[i],), callback=None)
       func_min = func_min [0]
       
       # The bias in Reconstruction Error is Eliminated
-      Reconstruction_LL[Pixels[i]] = -Neg_Reconstruction_Error(func_min,Pixels[i]) 
+      Reconstruction_LL[target_pixels[i]] = -Neg_Reconstruction_Error(func_min,target_pixels[i]) 
     
     Reconstruction_LL=np.float(Reconstruction_LL)
     
     # Creating Dictionary to store unique values.
     Dict = {}
-    Pixels=Pixels.astype(np.float32)
+    target_pixels=target_pixels.astype(np.float32)
     for i in range(len(Pixels)):
-        Dict[(Pixels[i] * 1000).round().astype(np.int32)] = Reconstruction_LL[Pixels[i]]
+        Dict[(target_pixels[i] * 1000).round().astype(np.int32)] = Reconstruction_LL[target_pixels[i]]
    
     # It will take in each element of the array and return the corresponding value from the Dict dictionary.
     # It will quickly access multiple values in a dictionary.
