@@ -44,7 +44,8 @@ class VAE(tfk.Model):
     if self.visible_dist == 'cont_bernoulli':
       start=1e-3; stop=1-start; num=999
       target_pixels = np.linspace(start, stop, num)
-      self.correct = _1_analytical_correction.Analytical_Correction_For_Intensity_Bias(target_pixels)
+      Reconstruction_LL = _1_analytical_correction.Analytical_Correction_For_Intensity_Bias(target_pixels)
+      self.correct=np.vectorize(lambda x: Reconstruction_LL[x])
       
     elif self.visible_dist == 'bernoulli':
       self.corr_dict = dict(zip(np.round(np.linspace(1e-3, 1-1e-3, 999), decimals=3),
