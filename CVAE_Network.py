@@ -42,7 +42,9 @@ class VAE(tfk.Model):
   def compute_corrections(self, dataset=None):
     # pylint: disable=g-long-lambda
     if self.visible_dist == 'cont_bernoulli':
-      self.correct = _1_analytical_correction.Analytical_Correction_For_Intensity_Bias(Pixels)
+      start=1e-3; stop=1-start; num=999
+      target_pixels = np.linspace(start, stop, num)
+      self.correct = _1_analytical_correction.Analytical_Correction_For_Intensity_Bias(target_pixels)
       
     elif self.visible_dist == 'bernoulli':
       self.corr_dict = dict(zip(np.round(np.linspace(1e-3, 1-1e-3, 999), decimals=3),
