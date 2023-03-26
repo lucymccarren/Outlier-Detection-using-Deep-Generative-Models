@@ -23,7 +23,7 @@ def Neg_Reconstruction_Error(lambdaa,target):
 
 def Analytical_Correction_For_Intensity_Bias(Pixels): 
 
-    Reconstruction_LL = {}; #Dict={}
+    Reconstruction_LL = {}; #Dict
     target_pixels = np.linspace(1e-3, 1-1e-3, 999)
         
     # Correcting Bias in the Reconstruction Error for each Pixel.
@@ -41,14 +41,13 @@ def Analytical_Correction_For_Intensity_Bias(Pixels):
     Reconstruction_LL=np.float(Reconstruction_LL)
     
     # Creating Dictionary to store unique values.
-    Dict = {}
     target_pixels=target_pixels.astype(np.float32)
-    for i in range(len(Pixels)):
-        Dict[(target_pixels[i] * 1000).round().astype(np.int32)] = Reconstruction_LL[target_pixels[i]]
+    for i in range(len(target_pixels)):
+        Reconstruction_LL[(target_pixels[i] * 1000).round().astype(np.int32)] = Reconstruction_LL[target_pixels[i]]
    
     # It will take in each element of the array and return the corresponding value from the Dict dictionary.
     # It will quickly access multiple values in a dictionary.
-    Correction=np.vectorize(lambda x: Dict[x])
+    Correction=np.vectorize(lambda x: Reconstruction_LL[x])
     
     return Correction
 
