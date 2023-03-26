@@ -53,11 +53,11 @@ class VAE(tfk.Model):
     elif self.visible_dist == 'bernoulli':
       self.corr_dict = dict(zip(np.round(np.linspace(1e-3, 1-1e-3, 999), decimals=3),
           tfd.Bernoulli(probs=tf.linspace(1e-3, 1-1e-3, 999)).log_prob(tf.linspace(1e-3, 1-1e-3, 999)).numpy()))
+      print('self.corr_dict',self.corr_dict)
       corr_func = lambda pix: self.corr_dict[(np.clip(pix, 1e-3, 1-1e-3).astype(float).round(decimals=3))].astype(np.float32)
       self.correct = np.vectorize(corr_func)
       
     elif self.visible_dist == 'categorical':
-      # self.compute_algorithmic_correction(dataset=dataset)
       self.correct = compute_algorithmic_correction(self,self.inp_shape,dataset=dataset)
 
   def kl_divergence_loss(self, target, posterior):
