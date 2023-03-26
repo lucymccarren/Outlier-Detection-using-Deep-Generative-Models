@@ -37,15 +37,8 @@ def Analytical_Correction_For_Intensity_Bias(Pixels):
       func_min = func_min [0]
       
       # The bias in Reconstruction Error is Eliminated
-      Reconstruction_LL[target_pixels[i]] = -Neg_Reconstruction_Error(func_min,target_pixels[i]) 
-    
-    Reconstruction_LL=np.float(Reconstruction_LL)
-    
-    # Creating Dictionary to store unique values.
-    target_pixels=target_pixels.astype(np.float32)
-    for i in range(len(target_pixels)):
-        Reconstruction_LL[(target_pixels[i] * 1000).round().astype(np.int32)] = Reconstruction_LL[target_pixels[i]]
-   
+      Reconstruction_LL[(target_pixels[i] * 1000).round().astype(np.int32)] = -Neg_Reconstruction_Error(func_min,target_pixels[i]) 
+
     # It will take in each element of the array and return the corresponding value from the Dict dictionary.
     # It will quickly access multiple values in a dictionary.
     Correction=np.vectorize(lambda x: Reconstruction_LL[x])
