@@ -36,18 +36,14 @@ def Analytical_Correction_For_Intensity_Bias(target_pixels):
       
       # The bias in Reconstruction Error is Eliminated
       Reconstruction_LL[(target_pixels[i] * 1000).round().astype(np.int32)] = -Neg_Reconstruction_Error(func_min,target_pixels[i]) 
-
-    # It will take in each element of the array and return the corresponding value from the Dict dictionary.
-    # It will quickly access multiple values in a dictionary.
-    Correction=np.vectorize(lambda x: Reconstruction_LL[x])
     
-    return Correction
+    return Reconstruction_LL
 
-def Plot_Likelihood(Pixels, Reconstruction_LL):
+def Plot_Likelihood(target_pixels, Reconstruction_LL):
     plt.figure(figsize=(15,15))
     plt.ylabel("Reconstructed LL")
-    plt.xlabel("Pixel Intensity")
-    plt.plot(Pixels, Reconstruction_LL)
+    plt.xlabel("Target Pixel")
+    plt.plot(target_pixels, Reconstruction_LL)
     plt.show()
     
     return
