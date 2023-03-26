@@ -21,7 +21,7 @@ def Neg_Reconstruction_Error(lambdaa,target):
 
     return log_pdf
 
-def Analytical_Correction_For_Intensity_Bias(Pixels): 
+def Analytical_Correction_For_Intensity_Bias(): 
 
     Reconstruction_LL = {}; #Dict
     start=1e-3; stop=1-start; num=999
