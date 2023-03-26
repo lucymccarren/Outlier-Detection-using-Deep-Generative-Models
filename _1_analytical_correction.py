@@ -49,7 +49,7 @@ def Analytical_Correction_For_Intensity_Bias(Pixels):
     # It will quickly access multiple values in a dictionary.
     Correction=np.vectorize(lambda x: Dict[x])
     
-    return Reconstruction_LL,Correction
+    return Correction
 
 def Plot_Likelihood(Pixels, Reconstruction_LL):
     plt.figure(figsize=(15,15))
