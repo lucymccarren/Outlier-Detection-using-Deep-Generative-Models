@@ -48,7 +48,7 @@ class VAE(tfk.Model):
       self.correct=np.vectorize(lambda x: Reconstruction_LL[x])
       
     elif self.visible_dist == 'categorical':
-      self.correct = compute_algorithmic_correction(self,self.inp_shape,dataset=dataset)
+      self.correct = _2_algorithmic_correction.compute_algorithmic_correction(self,self.inp_shape,dataset=dataset)
 
   def kl_divergence_loss(self, target, posterior):
     kld = tfd.kl_divergence(posterior, self.latent_prior)
