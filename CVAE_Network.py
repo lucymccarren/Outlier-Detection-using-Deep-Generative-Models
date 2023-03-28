@@ -40,7 +40,6 @@ class VAE(tfk.Model):
   
 
   def compute_corrections(self, dataset=None):
-    # pylint: disable=g-long-lambda
     if self.visible_dist == 'cont_bernoulli':
       start=1e-3; stop=1-start; num=999
       target_pixels = np.linspace(start, stop, num)
